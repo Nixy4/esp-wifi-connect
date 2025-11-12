@@ -4,6 +4,7 @@ idf_component_register(
         "wifi_station.cc"
         "ssid_manager.cc"
         "dns_server.cc"
+        "wifi_configuration_sc.cc"
     INCLUDE_DIRS
         "include"
     EMBED_TXTFILES
@@ -15,4 +16,5 @@ idf_component_register(
         "esp_wifi"
         "nvs_flash"
         "json"
+        "main"
 )
