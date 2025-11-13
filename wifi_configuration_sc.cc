@@ -216,6 +216,9 @@ void WifiConfigurationSc::SmartConfigEventHandler(void *arg, esp_event_base_t ev
 
     self->Save(ssid, password);
 
+    ESP_ERROR_CHECK( esp_wifi_disconnect() );
+    ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
+    esp_wifi_connect();
     break;
   }
 
