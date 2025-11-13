@@ -120,7 +120,7 @@ void WifiConfigurationSc::WifiEventHandler(void *arg, esp_event_base_t event_bas
       WifiConfigurationSc* self = static_cast<WifiConfigurationSc*>(arg);
       EventBits_t uxBits;
 
-      ESP_ERROR_CHECK( esp_smartconfig_set_type(SC_TYPE_ESPTOUCH) );
+      ESP_ERROR_CHECK( esp_smartconfig_set_type(SC_TYPE_ESPTOUCH_AIRKISS) );
 
       smartconfig_start_config_t cfg = { 
         .enable_log = true, 
