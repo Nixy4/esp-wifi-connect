@@ -183,6 +183,7 @@ void WifiConfigurationSc::SmartConfigEventHandler(void *arg, esp_event_base_t ev
   {
   case SC_EVENT_SCAN_DONE:
   {
+    
     ESP_LOGI(TAG, "Scan done");
     break;
   }
@@ -197,13 +198,32 @@ void WifiConfigurationSc::SmartConfigEventHandler(void *arg, esp_event_base_t ev
   {
     ESP_LOGI(TAG, "Got SSID and password");
     smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
+
+    //*从ssid中提取密码和uid (格式: "密码@uid")
+    std::string ssid_str(reinterpret_cast<const char *>(evt->ssid));
+    std::string actual_password;
+    std::string uid;
+    
+    size_t at_pos = ssid_str.find('@');
+    if (at_pos != std::string::npos) {
+      actual_password = ssid_str.substr(0, at_pos);
+      uid = ssid_str.substr(at_pos + 1);
+      ESP_LOGI(TAG, "Extracted Password: %s, UID: %s", actual_password.c_str(), uid.c_str());
+    } else {
+      actual_password = ssid_str;
+      ESP_LOGW(TAG, "No UID found in SSID, using full string as password");
+    }
+
     wifi_config_t wifi_config;
-    // char ssid[33] = {0};
-    // char password[65] = {0};
-    // char rvd_data[33] = { 0 };
     bzero(&wifi_config, sizeof(wifi_config_t));
     memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
-    memcpy(wifi_config.sta.password, evt->password, sizeof(wifi_config.sta.password));
+    
+    size_t password_len = actual_password.length();
+    if (password_len > sizeof(wifi_config.sta.password)) {
+      password_len = sizeof(wifi_config.sta.password);
+    }
+    memcpy(wifi_config.sta.password, actual_password.c_str(), password_len);
+    
     ESP_LOGI(TAG, "SmartConfig SSID: %s, Password: %s", wifi_config.sta.ssid, wifi_config.sta.password);
 
     std::string ssid(reinterpret_cast<const char *>(wifi_config.sta.ssid),
